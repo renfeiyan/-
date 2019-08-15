@@ -1,0 +1,20 @@
+/** 字典缓存格式 */
+方式一:数据库查询
+    配置与dataSource等同,但是在dataSource的option项中配置dic项表名字典名称
+方式二:手动构建
+{
+    name:'' //字典名称
+    data:{
+        queryJson:  //整个查询的完整json
+        option:{
+            keyField:   //主键字段名称(如果有)
+            map:0           //返回的结果转换为键值对形式,结果只有value 转换后的结果为: value ==> {id:value,name:value}
+            tree:2          //返回的结果是否转换为树形结构,1:父子都在同一条记录情况,2:父子为2条记录的情况,使用本项必须配置option
+            option:{        //选项
+                pid:''      //父字段名称
+                id:''       //子字段名称
+                label:''    //显示字段
+            }
+        }
+    }
+}

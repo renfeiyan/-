@@ -1,0 +1,230 @@
+/** dataSource配置选项 */
+{
+    head:{  //必配, 操作数据头部
+        dbType:'mongodb'    //选配, 数据库类型,支持关系数据库和非关系数据库,默认为关系数据库, 非关系数据库目前只支持mongodb
+        module:'',       //模块编号,建议都设置
+        source:'',       //数据源编号,使用本项可以不设置module的值
+        view:'',         //视图名称,使用本项必须设置module值
+        table:'',        //表名称,使用本项必须设置module值
+    },
+    dependent: {    //选配, 控件依赖的其它控件,填写此项后数据和权限开始都不会加载,直到依赖的控件的当前行数据currSelection有值才会去加载加载数据和权限
+        target: ()=>$ref.,    //必配,格式为引用对象回调,例如依赖ref名称为role的表格控件,则格式为()=>$ref.role
+        filter:(row)=>[{}],    //必配,查询条件,row值为target控件的当前选中行数据,例如配置查询mid字段为row行字段的值,格式:[{name: 'mid', opt: '=', val: row.mid}]
+        call:(datasource,row)=>{}   //选配, 回调，参数为当前控件的datasource和target控件的当前行数据
+    },
+    option:{    //选配
+        isPrivilege: false, //选配, 对模块子表是否进行权限判断,默认为true
+        export:true  //选配, 导出数据时是否从数据库字典表拿字段名称和标题
+        attFile: [], //选配, 如果该文档中包含附件,则指明包含附件路径的字段名称
+        load:true,      //选配, 是否加载后就立即查询,默认为true,只有设置为false时初始化加载后才不拿数据
+        privilege:false,    //选配, 是否加载后立即从服务器拿按钮操作权限,默认为false,可设置类型:Boolean, String, Array
+        keyField:false,      //选配, 是否回传主键字段名称, 默认为false, 查询返回数据后变为主键字段的名称
+        dataConver:{
+            oid: array->string  //web需要的数据类型和服务器端数据类型
+        }
+        fields:'',       //选配, 需要返回的所有字段名称,多个字段间逗号分隔,针对表格只拿表格列中的字段,如果需要更多字段则设置本列,*代表数据库中所有字段
+        initRow:{},     //选配, 新增加一行数据时的每个字段默认值,可以是函数
+        dic:''               //选配, 对服务器返回的数据作为字典缓存,名字尽量与模块名称相同
+    },
+    att:{},          //选配, 发给服务器的扩展信息,json格式,默认为:null
+    query:{             //选配, 查询选项参数
+        url:'',         //选配, 查询地址,默认为: /data/query
+        order:'',         //选配, 服务器查询时排序,例如按姓名升序排序: 'name asc'
+        filter:[],
+        group:'id, name',   //选配,查询结果分组
+        merge: { //选配,联合查询
+            head:[{module:'sys_module',table:'sys_module'},{module:'sys_module',table:'sys_module_action'}],
+            on:{
+                join:'inner join sys_module on sys_privilege.mid = sys_module.mid INNER JOIN sys_module_action on sys_module.mid = sys_module_action.mid and sys_privilege.action = sys_module_action.action',
+                fields:'sys_privilege.mid as mid,sys_privilege.action as action,sys_module.name as midname,sys_module_action.name as actionname'
+                filter:[]        //选配, 服务器SQL过滤条件
+            }
+        }
+        beforeQueryEvn: null, //查询前的回调方法, 参数为:发往服务器的json数据和固定的'query'字符串,本方法返回false将终止后续操作
+        afterQueryEvn: null,  //查询后的回调, 参数为服务器返回数据
+    },
+    data:{              //选配, 对服务器返回的数据处理
+        addData:[],     //选配, 附加数据,从服务器拿到数据后附加在后面
+        map:0           //选配, 返回的结果转换为键值对形式,结果只有value 转换后的结果为: value ==> {id:value,name:value}
+        tree:2          //选配, 返回的结果是否转换为树形结构,1:父子都在同一条记录情况,2:父子为2条记录的情况,使用本项必须配置option
+        option:{        //选配, 下拉选择框必配,包括(x-select,x-selectTree)
+            pid:''      //选配, 父字段名称, 树型结构必配
+            id:''       //必配, 子字段名称
+            label:''    //必配, 显示字段
+        },
+        rowEvn:         //选配, 数据重新组装前每一行遍历回调,参数为服务器的返回的每一行JSON数据
+    },
+    webEvn:{   //选配, 浏览器前端回调事件
+        beforeAddEvn:       //选配, 点击增加按钮前的函数回调,注意不是保存事件
+        beforeEditEvn:      //选配, 点击编辑按钮前的函数回调,注意不是保存事件
+        beforeSeeEvn:       //选配, 点击删除按钮前的函数回调,注意不是保存事件
+        afterAddEvn:        //选配, 点击增加按钮后的函数回调,注意不是保存事件, 参数为currEditSelection
+        afterEditEvn:       //选配, 点击编辑按钮后的函数回调,注意不是保存事件, 参数currEditSelection
+        afterSeeEvn:        //选配, 点击查看按钮后的函数回调,注意不是保存事件, 参数为currEditSelection
+
+        beforeSaveEvn:  //选配, add,edit,del 保存操作前的回调函数, 参数为操作类型和发往服务器的数据,本方法返回false将终止后续操作
+        beforeAddSaveEvn:   //选配, 新增数据前的回调, 参数为发往服务器的数据,本方法返回false将终止后续操作
+        beforeEditSaveEvn:  //选配, 编辑数据前的回调, 参数为发往服务器的数据,本方法返回false将终止后续操作
+        beforeDelSaveEvn:   //选配, 删除数据前的回调, 参数为发往服务器的数据,本方法返回false将终止后续操作
+        afterAddSaveEvn:    //选配, 成功新增后的回调, 参数为服务器返回数据
+        afterEditSaveEvn:   //选配, 成功编辑后的回调, 参数为服务器返回数据
+        afterDelSaveEvn:    //选配, 成功删除后的回调, 参数为服务器返回数据
+        afterSaveEvn:   //选配, add,edit,del 成功保存后的回调函数, 参数为操作类型和服务器返回数据
+    },
+    save:{             //选配, 保存数据的选项
+        noSaveFields:[]  //选配, 服务器不存储的字段数组
+        rowEvn: //选配, 数据保存前每一行遍历回调,参数为每一行JSON数据
+        add:{   //选配, 新增加数据时的选项
+            head:{} //选配, 操作数据时的head, 不配置则采用上级的head
+            keyVal:false      //选配, 是否需要服务器传回新增加的数据的主键值
+            url:''        //选配, 新增数据url地址,默认为: /data/save
+            filter:[]   //选配, 格式等同于del选项内的rule
+            serverEvn: [] //选配, 格式等同于del选项内的serverEvn
+        },
+        edit:{  //选配, 修改数据时的选项
+            head:{} //选配, 操作数据时的head, 不配置则采用上级的head
+            url:''      //选配, 修改数据地址,默认为: /data/save
+            filter:[]   //选配, 格式等同于del选项内的filter
+            serverEvn:[ //选配, 注意格式与add和del稍有不同
+                {
+                    field:[],  //必配, 字段名称,只有改变此配置的数据才会执行下行的serverEvn
+                    serverEvn:[]  //必配, 上面选项field内的字段值有变化才执行此serverEvn, 格式等同于del选项内的serverEvn
+                }
+            ]
+        }
+        del:{   //选配, 删除数据时的选项
+            url:''      //选配, 删除数据地址,默认为: /data/save
+            filter:[]   //选配,
+            serverEvn:[   //选配,服务器端的其它操作
+                {
+                    head:{  //选配, 格式等同上级head格式, 如果不配则直接复用上级的head
+                        module:'',   //操作的模块,如果不设置则采用上一级的module
+                        table: 'sys_user_log',   //操作的表
+                    },
+                    data:[  //必须配置, 格式等同上级data格式
+                        {
+                            action: 'edit', //必须配置, 操作类型:add,edit,del
+                            rows: [ //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                {
+                                    keyVal: "111",  //选配, 主键字段的值，选配时可通过filter条件来确定数据行
+                                    row:{  //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                        w1: "#{w1}",   //w1字段的值
+                                        w2: "&{w2}",    //w2字段的值,&表示如果该值为数组则会产生多条记录
+                                    },
+                                    filter:[]
+                                }
+                            ],
+                            filter: [ //选配, 查询条件,变量采用 #{} 方式,旧值采用old. ,新值采用new. 注意:AND或OR后面必须是数组,如果中括号前不写AND或OR，则默认为AND
+                                {AND:[{'rid':{'=':'#{rid}'}}]}  ==>{'rid':{'=':'#{rid}'}}  => {'rid':'#{rid}'} //简写方式,操作符默认为=
+                                {OR:[{'rid':{'=':'#{rid}'}}     ==>{'rid':{'=':'#{rid}'}}  => {'rid':'#{rid}'} //简写方式
+                                     {OR:[{'rid':{'=':'#{rid}'}}]}
+                                     {AND:[{'rid':{'=':'#{rid}'}}]}
+                                    ]
+                                }
+                                [{'rid':'#{rid}'},{'rid':{'=':'#{rid}'}}] //AND的简写方式
+                            ]
+                        }
+                    ],
+                    serverEvn:[]    //选配
+                }
+            ]
+        }
+    }
+
+}
+
+
+add新增选项例子:
+save:{
+        add:{
+            serverEvn:[
+                {
+                    head:{module:'sys_role',table:'sys_user_role'},
+                    data:[
+                        {
+                             action:'add',
+                             rows: [
+                                 {
+                                     row:{  //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                         uid: '#{sys_id}',   //rid字段的值
+                                         uid_name: '#{name}',
+                                         rid:'123'
+                                     }
+                                 }
+                             ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+edit新增选项例子:
+save:{
+    edit:{
+        serverEvn:[
+            {
+                field: ['name'],
+                serverEvn: [
+                    {
+                        head:{module:'role',table:'sys_user_role'},
+                        data:[
+                            {
+                                 action:'edit',
+                                 rows: [
+                                     {
+                                         row:{  //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                             uid: '#{rid}',
+                                             name: '#{name}'
+                                         },
+                                         filter:  [{name:'rid',opt:'=',val:'#{rid}'}]
+                                     }
+                                 ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+
+del删除选项例子:
+save:{
+    del:{
+        serverEvn:[
+            {
+                head:{module:'role',table:'sys_user_role'},
+                data:[
+                    {
+                         action:'del',
+                         filter: [{name:'rid',opt:'=',val:'#{rid}'}]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+//数据验证参考
+save:{
+    validate:{    //选配, 保存前数据校验
+        rules: {    //必配, 校验规则
+            passport: [ //字段名称
+                {
+                    type: 'email',  //已有校验类型,具体见rules.js,或者一个自定义校验函数
+                    message: '用户名为空！', //选配, 错误提示信息,如果不配置,则采用type类型中的message内容
+                    trigger: 'change'  //触发校验的事件
+                }
+            ],
+            name: [ //字段名称
+                {
+                    type: {length: [1,2]},  //已有校验类型和检验参数,具体见rules.js,或者一个自定义校验函数
+                    message: '用户名为空！', //选配, 错误提示信息,如果不配置,则采用type类型中的message内容
+                    trigger: 'change'  //触发校验的事件
+                }
+            ]
+        }
+    }
+}

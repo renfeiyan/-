@@ -1,0 +1,92 @@
+/** 数据保存时发往服务器的数组数据格式 */
+[{
+    head: { //头部
+        dbType:'mongodb'    //选配, 数据库类型,支持关系数据库和非关系数据库,默认为关系数据库, 非关系数据库目前只支持mongodb
+        module: "ww",   //模块编号
+        source: "",     //数据源编号
+        table: "sys_user",  //表名称
+    },
+    query:{}    //选配,等同于request-query的option项,用于保存后的查询返回最新数据列表
+    data: [ //要保存的操作和数据
+        {   //(item)
+            action: "add",  //必配, 操作类型
+            option: {
+                keyVal: false     //是否在新增数据后返回新增数据的主键值
+            }
+            rows: [
+                { //(rowsItem)
+                    keyVal: "111",  //主键字段的值，可以不要，通过filter条件来确定数据行
+                    row: {  //新增一行的新数据
+                        w1: "12",   //w1字段的新值
+                        w2: "1",    //w2字段的新值
+                    },
+                    filter:[] //选配, 查询条件
+                    serverEvn:[]
+                }
+            ],
+            filter: []  //选配, 查询条件
+            serverEvn:[]
+        },
+        {
+            action: "edit",   //add操作格式
+            rows: [ //可不要直接用filter或者rule条件
+                {
+                    keyVal: "111",  //主键字段的值，可以不要，通过filter条件来确定数据行
+                    row: {  //编辑一行的新数据
+                        w1: "12",   //w1字段的值
+                        w2: "1",    //w2字段的值
+                    },
+                    filter:[] //选配, 查询条件
+                    serverEvn:[]
+                },
+            ],
+            filter:[] //选配, 查询条件
+            serverEvn:[   //选配,服务器端的其它操作
+                {
+                    head:{  //选配, 格式等同上级head格式, 如果不配则直接复用上级的head
+                        module:'',   //操作的模块,如果不设置则采用上一级的module
+                        table: 'sys_user_log',   //操作的表
+                    },
+                    data:[  //必配, 格式等同上级data格式
+                        {
+                            action: 'edit', //必配, 操作类型:add,edit,del
+                            rows: [ //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                {
+                                    keyVal: "111",  //选配, 主键字段的值，不配时可通过filter条件来确定数据行
+                                    row:{  //选配, 但是新增add和修改edit必须配置,只有del才选配
+                                        w1: "12",   //w1字段的值
+                                        w2: "1",    //w2字段的值
+                                    },
+                                    filter:[] //选配, 查询条件
+                                }
+                            ],
+                            filter:{    //选配, 操作条件, 如果配置了则rows的操作filter没配置则采用此filter或rule
+                                in:'and',   //选配, 如果不配置则采用默认值:AND
+                                filter:[] //选配, 查询条件
+                            }
+                        }
+                    ],
+                    serverEvn:[]    //选配
+                }
+            ],
+        },
+        {
+            action: "del",  //删除操作格式
+            rows:[
+                {
+                    keyVal: "111",  //主键字段的值，可以不要，通过filter条件来确定数据行
+                    filter:[] //选配, 查询条件
+                    serverEvn:[]
+                }
+            ],
+            filter: [ //选配, 查询条件
+                {join:'and',name:'rid',opt:'=',val:'#{rid}'}, //必须配置,至少配置1个条件,变量采用 #{} 方式,旧值采用old. ,新值采用new.
+                {join:'and', name:'mid',opt:'=',val:'#{rid}'}   //选配, 如果join不配置则代表为 and
+                [
+
+                ]
+            ]
+            serverEvn:[]  //等同于data-source中的 serverEvn 项下的 del 项
+        }
+    ]
+}]

@@ -1,0 +1,44 @@
+/** 数据查询格式 */
+{
+    head: {
+        dbType:'mongodb'    //选配, 数据库类型,支持关系数据库和非关系数据库,默认为关系数据库, 非关系数据库目前只支持mongodb
+        module: "sys_position", //模块编号,在sys_module表中找
+        source: "sysPositionList_01", //sql语句编号,在sys_data_sql表中找
+        view: "",   //视图名称,在数据库视图名称中找
+        table:"     //表名称
+    },
+    option: {
+        isPrivilege: true,
+        export: false,      //是否导出数据
+        titles:[]   //导出字段的标题
+        keyField: false,     //是否需要回传主键字段名字
+        privilege:           //是否需要权限按钮按钮列表,可设置类型:Boolean, String, Array
+        load:false,         //是否装载数据
+        order: "",         //选配, 排序字段
+        group:'id, name',   //选配,查询结果分组
+
+        fields: "",     //选配, 回传的字段名称,为空或者*表示所有字段
+        page: 1,        //选配, 如果有分页,拿第几页
+        size: 10,       //选配, 如果有分页,每页数据行数
+        lastId:'',      //选配, 当前页的最后一条数据的_id值,作用为针对MongoDB的分页查询优化
+        merge:[
+            {
+                head:[{module:'sys_module',table:'sys_module'},{module:'sys_module',table:'sys_module_action'}],
+                on:{
+                    join:'inner join sys_module on sys_privilege.mid = sys_module.mid INNER JOIN sys_module_action on sys_module.mid = sys_module_action.mid and sys_privilege.action = sys_module_action.action',
+                    fields:'sys_module.name as midname,sys_module_action.name as actionname',
+                    filter:[]        //选配, 服务器SQL过滤条件
+                }
+            }
+        ]
+        filter: [ //选配, 查询条件,变量采用 #{} 方式,旧值采用old. ,新值采用new. 注意:AND或OR后面必须是数组,如果中括号前不写AND或OR，则默认为AND
+            {AND:[{'rid':{'=':'#{rid}'}}]}  ==>{'rid':{'=':'#{rid}'}}  => {'rid':'#{rid}'} //简写方式,操作符默认为=
+            {OR:[{'rid':{'=':'#{rid}'}}     ==>{'rid':{'=':'#{rid}'}}  => {'rid':'#{rid}'} //简写方式
+                 {OR:[{'rid':{'=':'#{rid}'}}]}
+                 {AND:[{'rid':{'=':'#{rid}'}}]}
+                ]
+            }
+            [{'rid':'#{rid}'},{'rid':{'=':'#{rid}'}}] //AND的简写方式
+        ]
+    },
+}

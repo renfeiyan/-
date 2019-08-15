@@ -1,0 +1,55 @@
+{
+    "name": "sei-ui-demo",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint",
+        "reInstall": "rm -rf node_modules >nul && npm i --registry=http://202.202.43.5:82/repository/sei-npm-group/ "
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "codemirror": "^5.47.0",
+        "echarts": "^4.2.1",
+        "el-tree-transfer": "^2.2.0",
+        "element-ui": "^2.10.0",
+        "js-base64": "^2.5.1",
+        "js-cookie": "^2.2.0",
+        "lodash": "^4.17.11",
+        "qs": "^6.7.0",
+        "screenfull": "^4.2.0",
+        "sei-ui": "0.0.44",
+        "vue": "^2.6.10",
+        "vue-router": "^3.0.6",
+        "vuex": "^3.1.1"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "^3.8.0",
+        "@vue/cli-plugin-eslint": "^3.8.0",
+        "@vue/cli-service": "^3.8.0",
+        "babel-eslint": "^10.0.1",
+        "babel-plugin-component": "^1.1.1",
+        "babel-plugin-import": "^1.11.2",
+        "babel-polyfill": "^6.26.0",
+        "babel-preset-env": "^1.7.0",
+        "eslint": "^5.16.0",
+        "eslint-plugin-vue": "^5.2.2",
+        "less": "^3.9.0",
+        "less-loader": "^5.0.0",
+        "lint-staged": "^8.1.7",
+        "lodash": "^4.17.11",
+        "mockjs": "^1.0.1-beta3",
+        "qs": "^6.7.0",
+        "vue-template-compiler": "^2.6.10"
+    },
+    "gitHooks": {
+        "pre-commit": "lint-staged"
+    },
+    "lint-staged": {
+        "*.{js,vue}": [
+            "vue-cli-service lint",
+            "git add"
+        ]
+    }
+}
